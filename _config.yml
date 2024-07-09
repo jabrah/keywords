@@ -38,6 +38,11 @@ collections:
   # Team collection used to enumerate project team members in '_team' folder
   team:
     output: false
+  keywords_descriptions:
+    output: true
+    layout: "facet_page_layout"
+    metadata:
+      source: "keywords_descriptions.csv"
 
 # --------------------------------------------------------------
 # SEARCH INDEX SETTINGS

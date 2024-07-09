@@ -1,0 +1,15 @@
+{% comment %}
+    Template for linking keywords on the document page to the correct keywords "search" page
+{% endcomment %}
+
+{% assign keywords = include.keywords | strip | split: "|" %}
+
+{%- for keyword in keywords | split: "|" -%}
+    {% assign kw = keyword | strip %}
+    {% assign site_data = site["keywords_descriptions"] | where: "Keyword", kw | first %}
+    
+    <a href="{{ site_data.url }}" class="badge badge-pill badge-info mr-1">
+        {{ kw }}
+    </a>
+{%- endfor -%}
+

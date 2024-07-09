@@ -52,6 +52,11 @@ layout: default
 <!-- The block below controls the item metadata table -->
 
     <h1 alt="{{ page.label }}" class='item-label'>{{ page.label }}</h1>
+
+    <section>
+      {{content}}
+    </section>
+
     <div class="row">
       {% if layout.meta.size %}
         {% assign metadata = layout.meta %}
@@ -59,15 +64,11 @@ layout: default
         {% assign metadata = page.meta %}
       {% endif %}
       {% if metadata.size %}
-        {% include item_metadata.html meta=metadata %}
+        {% include keywords_metadata.html meta=metadata %}
       {% endif %}
     </div>
 
     <div>
-      {%- comment -%}
-        Unfortunate chaining here, since it doesn't seem like "where_exp" can take variable values in comparisons
-        First get documents for our collection, filter by path, finally filter by filename
-      {%- endcomment -%}
       {% assign excerpt = site.documents | where: 'collection', page.collection | where_exp: 'doc', "doc.path contains '/excerpts/'" | where: 'basename', page.pid | first %}
       {% if excerpt %}
         {% capture excerpt_file %}excerpts/{{ page.pid }}.md{% endcapture %}

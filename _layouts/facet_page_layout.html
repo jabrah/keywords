@@ -1,28 +1,20 @@
 ---
 layout: default
 field: keywords
-value: 
 ---
 <div class="container">
   <div class="row">
-    <h1>By Keyword</h1>
-  </div>
-  <div class="row">
-    <p>Paragraph about Keywords</p>
+    <h1>Keywords</h1>
   </div>
   
   <div class="row">
     <ul class="w-100">
-      {% assign keywords = site.pages | where_exp: "page", "page.url contains 'pages/docs_by/keywords/'" %}
+      {% assign keywords = site[page.collection] %}
       {% for page in keywords %}
-        <li class="">
-          {% comment %}
-            page.url references ".html" for some reason, so strip the file ending,
-            then relativize the URL
-          {% endcomment %}
-          <a href='{{ page.url | split: "." | first | relative_url }}'>{{ page.value }}</a>
-        </li>
-      {% endfor %}
+      <li class="">
+        <a href="{{ page.url | relative_url }}">{{ page.Keyword }}</a>
+      </li>
+     {% endfor %}
     </ul>
   </div>
   
@@ -31,10 +23,20 @@ value:
   </div>
 
   <div class="row">
-    {% if page.value %}
-      {% include gallery.html collection='keywords' field=page.field value=page.value num_column=4 %}
-    {% endif %}
+    <h2>{{ page.label }}</h2>
   </div>
+
+  {% if page.Description %}
+    <div class="row">
+      {{ page.Description | markdownify }}
+    </div>
+  {% endif %}
+
+  {% if page.Keyword %}
+  <div class="row">
+    {% include gallery.html collection='keywords' field='keywords' value=page.Keyword num_column=4 %}
+  </div>
+  {% endif %}
 </div>
 
 <style>
