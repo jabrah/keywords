@@ -1,4 +1,5 @@
 ---
+layout: default
 field: keywords
 ---
 {%- comment -%}
@@ -20,79 +21,62 @@ Generate the list of nav links to all of our Keywords
   {% endfor %}
 {%- endcapture -%}
 
-<!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: "en" }}">
-  {%- include head.html -%}
-  <body>
-    {%- include header.html -%}
-    <main class="page-content" aria-label="Content">
+<div class="d-flex">
+  <nav class="facet-sidebar col-12 col-lg-3 d-none d-lg-block">
+    <ul class="list-group list-group-flush px-0 w-100">
+      {{ navs }}
+    </ul>
+  </nav>
 
-      <div class="container d-lg-flex">
-        <nav class="facet-sidebar col-12 col-lg-3 d-none d-lg-block">
-          <ul class="list-group list-group-flush px-0 w-100">
-            {{ navs }}
-          </ul>
-        </nav>
+  <section class="col">
+    <h1>Keywords</h1>
 
-        <section class="col">
-          <h1>Keywords</h1>
+    <h2 class="d-none d-lg-block">{{ page.label }}</h2>
 
-          <h2 class="d-none d-lg-block">{{ page.label }}</h2>
-
-          <nav id="side-nav-sm" class="d-block d-lg-none">
-            <button
-                class="navbar-toggler d-flex w-100"
-                data-toggle="collapse"
-                data-target="#side-nav-sm-collapse"
-                aria-controls="side-nav-sm-collapse"
-                aria-expanded="false"
-                aria-label="toggle keywords list"
-            >
-              <span class="navbar-toggler-icon">&#9776;</span>
-              <h2>{{ page.label }}</h2>
-            </button>
-            <div id="side-nav-sm-collapse" class="collapse navbar-collapse">
-              <ul class="list-group list-group-flush px-4 py-2">
-                {{ navs }}
-              </ul>
-            </div>
-          </nav>
-
-          {%- if content -%}
-            <div class="row">
-              {{content}}
-            </div>
-          {%- endif -%}
-      
-          
-      
-          {% if page.Description %}
-            {{ page.Description | markdownify }}
-          {% endif %}
-      
-          {% if page.Keyword %}
-            {% include gallery.html collection='keywords' field='keywords' value=page.Keyword num_column=3 %}
-          {% endif %}
-        </section>
-        
+    <nav id="side-nav-sm" class="d-block d-lg-none">
+      <button
+          class="navbar-toggler d-flex w-100"
+          data-toggle="collapse"
+          data-target="#side-nav-sm-collapse"
+          aria-controls="side-nav-sm-collapse"
+          aria-expanded="false"
+          aria-label="toggle keywords list"
+      >
+        <span class="navbar-toggler-icon">&#9776;</span>
+        <h2>{{ page.label }}</h2>
+      </button>
+      <div id="side-nav-sm-collapse" class="collapse navbar-collapse">
+        <ul class="list-group list-group-flush px-4 py-2">
+          {{ navs }}
+        </ul>
       </div>
-    </main>
-    {%- include footer.html -%}
-    <style>
-      ul {
-          list-style: none;
-          max-width: 100%;
-      }
-      #side-nav-sm button {
-        align-items: center;
-      }
-      #side-nav-sm-collapse {
-        max-height: 50vh;
-        overflow-y: auto;
-      }
-    </style>
-  </body>
-</html>
+    </nav>
 
+    {%- if content -%}
+      <div class="row">
+        {{content}}
+      </div>
+    {%- endif -%}
 
+    {% if page.Description %}
+      {{ page.Description | markdownify }}
+    {% endif %}
 
+    {% if page.Keyword %}
+      {% include gallery.html collection='keywords' field='keywords' value=page.Keyword num_column=3 %}
+    {% endif %}
+  </section>
+</div>
+<style>
+  ul {
+      list-style: none;
+      max-width: 100%;
+  }
+  #side-nav-sm button {
+    align-items: center;
+  }
+  #side-nav-sm-collapse {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+</style>
