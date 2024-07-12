@@ -1,48 +1,98 @@
 ---
-layout: default
 field: keywords
 ---
-<div class="container">
-  <div class="row">
-    <h1>Keywords</h1>
-  </div>
-  
-  <div class="row">
-    <ul class="w-100">
-      {% assign keywords = site[page.collection] %}
-      {% for page in keywords %}
-      <li class="">
-        <a href="{{ page.url | relative_url }}">{{ page.Keyword }}</a>
-      </li>
-     {% endfor %}
-    </ul>
-  </div>
-  
-  <div class="row">
-    {{content}}
-  </div>
+{%- comment -%}
+Generate the list of nav links to all of our Keywords
+{%- endcomment -%}
+{%- capture navs -%}
+  {% assign keywords = site[page.collection] %}
+  {% assign currentPage = page.pid %}
 
-  <div class="row">
-    <h2>{{ page.label }}</h2>
-  </div>
+  {% for page in keywords %}
+    {%- capture pageName -%}{{ page.name | split: "." | first }}{%- endcapture -%}
+    {%- assign activeClass = "list-group-item-dark" -%}
+    {%- if pageName != currentPage-%}
+      {%- assign activeClass = "" -%}
+    {%- endif -%}
+    <li class="list-group-item {{ activeClass }} py-2">
+      <a href="{{ page.url | relative_url }}">{{ page.Keyword }}</a>
+    </li>
+  {% endfor %}
+{%- endcapture -%}
 
-  {% if page.Description %}
-    <div class="row">
-      {{ page.Description | markdownify }}
-    </div>
-  {% endif %}
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+  {%- include head.html -%}
+  <body>
+    {%- include header.html -%}
+    <main class="page-content" aria-label="Content">
 
-  {% if page.Keyword %}
-  <div class="row">
-    {% include gallery.html collection='keywords' field='keywords' value=page.Keyword num_column=4 %}
-  </div>
-  {% endif %}
-</div>
+      <div class="container d-lg-flex">
+        <nav class="facet-sidebar col-12 col-lg-3 d-none d-lg-block">
+          <ul class="list-group list-group-flush px-0 w-100">
+            {{ navs }}
+          </ul>
+        </nav>
 
-<style>
-  ul {
-      columns: 3;
-      list-style: none;
-      max-width: 100%;
-  }
-</style>
+        <section class="col">
+          <h1>Keywords</h1>
+
+          <h2 class="d-none d-lg-block">{{ page.label }}</h2>
+
+          <nav id="side-nav-sm" class="d-block d-lg-none">
+            <button
+                class="navbar-toggler d-flex w-100"
+                data-toggle="collapse"
+                data-target="#side-nav-sm-collapse"
+                aria-controls="side-nav-sm-collapse"
+                aria-expanded="false"
+                aria-label="toggle keywords list"
+            >
+              <span class="navbar-toggler-icon">&#9776;</span>
+              <h2>{{ page.label }}</h2>
+            </button>
+            <div id="side-nav-sm-collapse" class="collapse navbar-collapse">
+              <ul class="list-group list-group-flush px-4 py-2">
+                {{ navs }}
+              </ul>
+            </div>
+          </nav>
+
+          {%- if content -%}
+            <div class="row">
+              {{content}}
+            </div>
+          {%- endif -%}
+      
+          
+      
+          {% if page.Description %}
+            {{ page.Description | markdownify }}
+          {% endif %}
+      
+          {% if page.Keyword %}
+            {% include gallery.html collection='keywords' field='keywords' value=page.Keyword num_column=3 %}
+          {% endif %}
+        </section>
+        
+      </div>
+    </main>
+    {%- include footer.html -%}
+    <style>
+      ul {
+          list-style: none;
+          max-width: 100%;
+      }
+      #side-nav-sm button {
+        align-items: center;
+      }
+      #side-nav-sm-collapse {
+        max-height: 50vh;
+        overflow-y: auto;
+      }
+    </style>
+  </body>
+</html>
+
+
+
