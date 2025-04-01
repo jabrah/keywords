@@ -157,7 +157,9 @@
             {% endfor %}
           {% endif %}
 
-          <div class="gallery-item-facets {{ newClasses | join: ' ' }} col-xl-{{min_column_width}} p-1">
+          <div 
+              class="gallery-item-facets {{ newClasses | join: ' ' }} col-xl-{{min_column_width}} p-1"
+              style="opacity: 0;">
             <a href="{{ item.url | relative_url }}">
               <div class="card thumbnail-card h-100">
                 <img
@@ -191,6 +193,14 @@
       </div>
   </div>
 </div>
+
+<script>
+  Motion.animate(
+    '.gallery-item-facets',
+    { opacity: 1 },
+    { delay: Motion.stagger(0.1, { ease: 'linear' }) }
+  );
+</script>
 
 <!-- END GALLERY -->
     
