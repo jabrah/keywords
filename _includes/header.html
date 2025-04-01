@@ -1,33 +1,52 @@
 <header class="site-header">
     <nav class="navbar navbar-expand-md banner">
         <a class="navbar-brand d-flex align-items-center" rel="author" href="{{ '/' | relative_url }}">
-            <img src="{{ site.header | absolute_url }}" alt="Site Logo" style="height: 40px; margin-right: 10px;">
-        <a class="title navbar-brand" rel="author" href="{{ '/' | relative_url }}">{{ site.title | escape }}</a>
+            <img src="{{ site.header | absolute_url }}" 
+                alt="Site Logo" 
+                style="height: 40px; margin-right: 10px;">
+        </a>
+        <a class="title navbar-brand" rel="author" href="{{ '/' | relative_url }}">
+            {{ site.title | escape }}
+        </a>
         <span class="subtitle navbar-text">{{ site.subtitle | escape }}</span>
-  <!-- Collapse button -->
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent15"
-    aria-controls="navbarSupportedContent15" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon">&#9776;</span></button>
+        <!-- Collapse button -->
+        <button class="navbar-toggler" 
+                type="button" 
+                data-toggle="collapse" 
+                data-target="#navbarSupportedContent15"
+                aria-controls="navbarSupportedContent15" 
+                aria-expanded="false" 
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon">&#9776;</span>
+        </button>
 
-  <!-- Collapsible content -->
+        <!-- Collapsible content -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent15">
-                
-    <!-- Links -->
+            <!-- Links -->
             <ul class="navbar-nav ml-auto">
             {% for item in site.menu %}
                 {% if item.sub %}
                 <li class='nav-item dropdown'>
-                <a class='nav-link dropdown-toggle' href='#' id='wax-{{ item.label | slugify }}-dropdown' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                {{ item.label }}
-                </a>
-                <div class='dropdown-menu' aria-labelledby='wax-{{ item.label | slugify }}-dropdown'>
-                {% for sub in item.sub %}
-                <a class='dropdown-item' href='{{ sub.link | absolute_url }}'>{{ sub.label }}</a>
-                {% endfor %}
-                </div>
+                    <a class='nav-link dropdown-toggle' 
+                            href='#' 
+                            id='wax-{{ item.label | slugify }}-dropdown' 
+                            data-toggle='dropdown' aria-haspopup='true' 
+                            aria-expanded='false'>
+                        {{ item.label }}
+                    </a>
+                    <div class='dropdown-menu' aria-labelledby='wax-{{ item.label | slugify }}-dropdown'>
+                        {% for sub in item.sub %}
+                        <a class='dropdown-item' href='{{ sub.link | absolute_url }}'>
+                            {{ sub.label }}
+                        </a>
+                        {% endfor %}
+                    </div>
                 </li>
                 {% else %}
                 <li class='nav-item'>
-                    <a class='nav-link' href='{{ item.link | absolute_url }}'>{{ item.label }}</a>
+                    <a class='nav-link' href='{{ item.link | absolute_url }}'>
+                        {{ item.label }}
+                    </a>
                 </li>
                 {% endif %}
             {% endfor %}                
@@ -40,7 +59,7 @@
         overflow-y: hidden;
     }
 </style>
-<script type="module">
+<script>
     /**
      * Bit of a weird mess that only "mostly" works.
      * 
@@ -58,7 +77,7 @@
      * On first hover, the menu pops into existance. Subsequent hovers, it
      * animates as expected. Possible initialization issue.
      */
-    import { animate, hover } from '{{ "/assets/js/motion.esm.js" | absolute_url }}';
+    // import { animate, hover } from '{{ "/assets/js/motion.esm.js" | absolute_url }}';
 
     function show(element) {
         const size = getHeight(element);
@@ -71,7 +90,7 @@
                 child.setAttribute('aria-expanded', true);
             } else if (child.classList.contains('dropdown-menu')) {
                 child.classList.add('show');
-                animate(child, { height: size }, { duration: 0.15 });
+                Motion.animate(child, { height: size }, { duration: 0.15 });
             }
         }
     }
@@ -85,7 +104,7 @@
                 element.classList.remove('show');
                 child.setAttribute('aria-expanded', false);
             } else if (child.classList.contains('dropdown-menu')) {
-                animate(child, { height: 0 }, { duration: 0.1 })
+                Motion.animate(child, { height: 0 }, { duration: 0.1 })
                     .then(() => child.classList.remove('show'));
             }
         }
@@ -99,7 +118,7 @@
     }
 
     let hovered = [];
-    hover('.dropdown', (el) => {
+    Motion.hover('.dropdown', (el) => {
         if (hovered.length !== 0) {
             hide(hovered.pop());
         }
@@ -108,7 +127,7 @@
         return (endEvent) => {};
     });
 
-    hover('.dropdown-menu', (el) => {
+    Motion.hover('.dropdown-menu', (el) => {
         const menuId = el.getAttribute('aria-labelledby');
         return () => {
             if (hovered.length === 0) {
