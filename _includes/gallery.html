@@ -194,16 +194,28 @@
   </div>
 </div>
 
+<style>
+  .gallery-item-facets a {
+    overflow: hidden;
+  }
+</style>
+
 <script>
+  // Pop in cards one at a time
   Motion.animate(
     '.gallery-item-facets',
     { opacity: 1 },
     { delay: Motion.stagger(0.1, { ease: 'linear' }) }
   );
+
+  // Card on hover effects
+  Motion.hover('.gallery-item-facets', (elem) => {
+    const img = elem.querySelector('img');
+    Motion.animate(img, { scale: 1.2, 'clip-path': 'inset(8%)' }, { duration: 0.25 });
+    return () => {
+      Motion.animate(img, { scale: 1, 'clip-path': 'inset(0%)' }, { duration: 0.15 });
+    };
+  });
 </script>
 
 <!-- END GALLERY -->
-    
-
-    
-    
