@@ -34,7 +34,9 @@
                             aria-expanded='false'>
                         {{ item.label }}
                     </a>
-                    <div class='dropdown-menu' aria-labelledby='wax-{{ item.label | slugify }}-dropdown'>
+                    <div class='dropdown-menu' 
+                            aria-labelledby='wax-{{ item.label | slugify }}-dropdown'
+                            style="height: 0">
                         {% for sub in item.sub %}
                         <a class='dropdown-item' href='{{ sub.link | absolute_url }}'>
                             {{ sub.label }}
@@ -56,10 +58,21 @@
 </header>
 <style>
     .dropdown-menu {
-        overflow-y: hidden;
+        overflow: hidden;
+    }
+    .dropdown-item.active {
+        background-color: #bae5ce;
     }
 </style>
 <script>
+    const currentPageNav = document.querySelector(
+        `nav .dropdown-item[href='${document.location.href}']`
+    );
+
+    if (currentPageNav) {
+        currentPageNav.classList.add('active');
+    }
+
     /**
      * Bit of a weird mess that only "mostly" works.
      * 
@@ -79,6 +92,17 @@
      */
     // import { animate, hover } from '{{ "/assets/js/motion.esm.js" | absolute_url }}';
 
+    const duration = {
+        dropdown: {
+            show: 0.15,
+            hide: 0.1
+        },
+        menuItem: {
+            show: 0.25,
+            hide: 0.15
+        }
+    };
+
     function show(element) {
         const size = getHeight(element);
         for (const child of element.childNodes) {
@@ -90,7 +114,7 @@
                 child.setAttribute('aria-expanded', true);
             } else if (child.classList.contains('dropdown-menu')) {
                 child.classList.add('show');
-                Motion.animate(child, { height: size }, { duration: 0.15 });
+                Motion.animate(child, { height: size }, { duration: duration.dropdown.show });
             }
         }
     }
@@ -104,7 +128,7 @@
                 element.classList.remove('show');
                 child.setAttribute('aria-expanded', false);
             } else if (child.classList.contains('dropdown-menu')) {
-                Motion.animate(child, { height: 0 }, { duration: 0.1 })
+                Motion.animate(child, { height: 0 }, { duration: duration.dropdown.hide })
                     .then(() => child.classList.remove('show'));
             }
         }
@@ -141,4 +165,10 @@
         };
     });
 
+    Motion.hover('.dropdown-item', (item) => {
+        Motion.animate(item, { scale: 1.15 }, { duration: duration.menuItem.show });
+        return () => {
+            Motion.animate(item, { scale: 1 }, { duration: duration.menuItem.hide });
+        };
+    });
 </script>
