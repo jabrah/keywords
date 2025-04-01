@@ -35,3 +35,73 @@
         </div>
     </nav>
 </header>
+<script type="module">
+    /**
+     * Bit of a weird mess that only "mostly" works.
+     * 
+     * Get on hover functionality to work for the nav dropdown menus.
+     * On mouse hover over the dropdown toggle, open the menu. But if
+     * the mouse leaves the toggle and moves into the menu itself, keep
+     * it open. Close the dropdown if the mouse then leaves the menu.
+     * 
+     * This is currently not able to close the dropdown menu if the mouse
+     * hovers over the toggle then leaves somewhere else, as there is no
+     * straightforward way to get the interactions of the hovering over the
+     * toggle element and the hover over the open menu to interact
+     * meaningfully.
+     */
+    import { hover } from '{{ "/assets/js/motion.esm.js" | absolute_url }}';
+
+    function show(element) {
+        for (const child of element.childNodes) {
+            if (!(child instanceof HTMLElement)) {
+                continue;
+            }
+            if (child.classList.contains('dropdown-toggle')) {
+                element.classList.add('show');
+                child.setAttribute('aria-expanded', true);
+            } else if (child.classList.contains('dropdown-menu')) {
+                child.classList.add('show');
+            }
+        }
+    }
+
+    function hide(element) {
+        for (const child of element.childNodes) {
+            if (!(child instanceof HTMLElement)) {
+                continue;
+            }
+            if (child.classList.contains('dropdown-toggle')) {
+                element.classList.remove('show');
+                child.setAttribute('aria-expanded', false);
+            } else if (child.classList.contains('dropdown-menu')) {
+                child.classList.remove('show');
+            }
+        }
+    }
+
+    let hovered = [];
+    hover('.dropdown', (el) => {
+        if (hovered.length !== 0) {
+            hide(hovered.pop());
+        }
+        hovered.push(el);
+        show(el);
+        return (endEvent) => {};
+    });
+
+    hover('.dropdown-menu', (el) => {
+        const menuId = el.getAttribute('aria-labelledby');
+        return () => {
+            if (hovered.length === 0) {
+                return;
+            }
+            const openMenu = hovered[0];
+            if (openMenu.firstElementChild?.getAttribute('id') === menuId) {
+                hide(openMenu);
+                hovered.pop();
+            }
+        };
+    });
+
+</script>
