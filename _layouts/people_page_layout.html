@@ -15,10 +15,26 @@ layout: default
 <section id="people-of-keywords">
     <div class="list-group-flush">
         {% for person in site["people"] %}
-            <a href="{{ person.url }}" class="list-group-item">
+            <a href="{{ person.url }}" class="list-group-item" style="opacity: 0">
                 <h3>{{ person.full_name }}</h3>
                 <p>{{ person.biographical_notes }}</p>
             </a>
         {% endfor %}
     </div>
 </section>
+
+<script>
+    // Initial page load
+    Motion.animate(
+        '#people-of-keywords .list-group-item',
+        { opacity: 1 },
+        { delay: Motion.stagger(0.05) }
+    );
+
+    Motion.hover('#people-of-keywords .list-group-item', (elem) => {
+        Motion.animate(elem, { scale: 1.05 }, { duration: 0.2 });
+        return () => {
+            Motion.animate(elem, { scale: 1 }, { duration: 0.1 });
+        };
+    });
+</script>
