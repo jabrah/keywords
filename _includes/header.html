@@ -35,6 +35,11 @@
         </div>
     </nav>
 </header>
+<style>
+    .dropdown-menu {
+        overflow-y: hidden;
+    }
+</style>
 <script type="module">
     /**
      * Bit of a weird mess that only "mostly" works.
@@ -49,10 +54,14 @@
      * straightforward way to get the interactions of the hovering over the
      * toggle element and the hover over the open menu to interact
      * meaningfully.
+     * 
+     * On first hover, the menu pops into existance. Subsequent hovers, it
+     * animates as expected. Possible initialization issue.
      */
-    import { hover } from '{{ "/assets/js/motion.esm.js" | absolute_url }}';
+    import { animate, hover } from '{{ "/assets/js/motion.esm.js" | absolute_url }}';
 
     function show(element) {
+        const size = getHeight(element);
         for (const child of element.childNodes) {
             if (!(child instanceof HTMLElement)) {
                 continue;
@@ -62,6 +71,7 @@
                 child.setAttribute('aria-expanded', true);
             } else if (child.classList.contains('dropdown-menu')) {
                 child.classList.add('show');
+                animate(child, { height: size }, { duration: 0.15 });
             }
         }
     }
@@ -75,9 +85,17 @@
                 element.classList.remove('show');
                 child.setAttribute('aria-expanded', false);
             } else if (child.classList.contains('dropdown-menu')) {
-                child.classList.remove('show');
+                animate(child, { height: 0 }, { duration: 0.1 })
+                    .then(() => child.classList.remove('show'));
             }
         }
+    }
+
+    /**
+     * (Number of menu elements) * (static item height) + (y padding)
+     */
+    function getHeight(el) {
+        return el.querySelectorAll('.dropdown-item').length * 32 + 18;
     }
 
     let hovered = [];
