@@ -38,13 +38,13 @@ layout: default
   {% endif %}
 
   {% if viewer %}
-        <div class='item-view w-100 mb-2' >
-          {% if viewer == 'openseadragon' %}
-            {% include osd_iiif_image_viewer.html manifest=page.manifest prevlink=prevlink nextlink=nextlink %}
-          {% else %}
-             {% include simple_image_viewer.html full_image=page.full prevlink=prevlink nextlink=nextlink %}
-          {% endif %}
-        </div>
+    <div class='item-view w-100 mb-2' >
+      {% if viewer == 'openseadragon' %}
+        {% include osd_iiif_image_viewer.html manifest=page.manifest prevlink=prevlink nextlink=nextlink %}
+      {% else %}
+          {% include simple_image_viewer.html full_image=page.full prevlink=prevlink nextlink=nextlink %}
+      {% endif %}
+    </div>
   {% endif %}
 
   <div class="card-body item-metadata w-100">
@@ -73,8 +73,48 @@ layout: default
       {% if excerpt %}
         {% capture excerpt_file %}excerpts/{{ page.pid }}.md{% endcapture %}
         {% capture data %}{% include_relative {{ excerpt_file }} %}{% endcapture %}
-        {{ data | markdownify }}  
+        <div class="excerpt">
+          {{ data | markdownify }}  
+        </div>
       {% endif %}
     </div>
   </div>
 </div>
+
+<script>
+  const hiddenElements = [
+    '.card',
+    '.metadata-block dt',
+    '.metadata-block dd',
+    '.metadata-block dd .badge-pill',
+    '.excerpt h1',
+    '.excerpt h2',
+    '.excerpt p',
+    '.excerpt div'
+  ].join(',');
+  // Initial page load
+  // TODO:
+  // Not quite right, we'll want the pills to stagger-appear inline with
+  // its container <dd>. Currently, all <dt> and <dd> stagger-appear, then
+  // the pills stagger-appear
+  Motion.animate(hiddenElements, { opacity: 0 }, { duration: 0 })
+    .then(() => Motion.animate('.card', { opacity: 1 }, { duration: 0.2 }))
+    .then(() => Motion.animate(
+        '.metadata-block dt, .metadata-block dd',
+        { opacity: 1 },
+        { delay: Motion.stagger(0.05) }
+      ).then(() => {
+        return Promise.all(
+          Motion.animate(
+            '.metadata-block dd .badge-pill',
+            { opacity: 1 },
+            { delay: Motion.stagger(0.1) }
+          ),
+          Motion.animate(
+            '.excerpt h1, .excerpt h2, .excerpt p, .excerpt div',
+            { opacity: 1 },
+            { delay: Motion.stagger(0.1) }
+          ));
+      })
+    );
+</script>
