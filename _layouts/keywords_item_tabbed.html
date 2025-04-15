@@ -1,0 +1,164 @@
+---
+layout: default
+---
+
+{% assign links = site[page.collection] | sort: 'order' | map: 'url' %}
+{% for link in links %}
+  {% if link == page.url %}
+    {% if forloop.first %}
+      {% assign prevlink = links | last %}
+      {% assign nextlink = links[forloop.index] %}
+    {% elsif forloop.last %}
+      {% assign prevlink = prev %}
+      {% assign nextlink = links | first %}
+    {% else %}
+      {% assign prevlink = prev %}
+      {% assign nextlink = links[forloop.index] %}
+    {% endif %}
+  {% endif %}
+  {% assign prev = link %}
+{% endfor %}
+
+
+
+{% if page.image_viewer %}
+  {% assign viewer = page.image_viewer %}
+{% elsif layout.image_viewer %}
+  {% assign viewer = layout.image_viewer %}
+{% endif %}
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="pagination mx-auto">
+      <div class='pagination-link' id='prevlink'><a href='{{ prevlink | absolute_url }}' >&#9668;</a></div>
+      <div class='pagination-link' id='nextlink'><a href='{{ nextlink | absolute_url }}' >&#9658;</a></div>  </div>
+  </div>
+  
+  <div class="row">
+    <h1 alt="{{ page.label }}" class='item-label'>{{ page.label }}</h1>
+  </div>
+  
+  <div class="row">
+    <section>
+      {{content}}
+    </section>
+  </div>
+
+  <div class="thumbnail-card">
+    <div class="row">
+      {% if viewer %}
+      <div class="col-lg-6">
+        <div class="w-100 h-100 mb-2">
+          {% if viewer == 'openseadragon' %}
+            {% include osd_iiif_image_viewer.html manifest=page.manifest prevlink=prevlink nextlink=nextlink %}
+          {% else %}
+              {% include simple_image_viewer.html full_image=page.full prevlink=prevlink nextlink=nextlink %}
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+  
+      {% assign excerpt = site.documents | where: 'collection', page.collection | where_exp: 'doc', "doc.path contains '/excerpts/'" | where: 'basename', page.pid | first %}
+      
+      <div class="col-lg-6 h-100">
+        <ul class="nav nav-tabs" id="data-tablist" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button 
+                class="nav-link active"
+                id="description-tab"
+                data-toggle="tab"
+                data-target="#description"
+                type="button"
+                role="tab"
+                aria-controls="description"
+                aria-selected="true"
+              >
+              Description
+            </button>
+          </li>
+          {% if excerpt %}
+          <li class="nav-item" role="presentation">
+            <button
+                class="nav-link"
+                id="transcription-tab"
+                data-toggle="tab"
+                data-target="#transcription"
+                type="button"
+                role="tab"
+                aria-controls="transcription"
+                aria-selected="false"
+              >
+              Transcription / Translation
+            </button>
+          </li>
+          {% endif %}
+        </ul>
+    
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+            <div class="row">
+              {% if layout.meta.size %}
+                {% assign metadata = layout.meta %}
+              {% elsif page.meta.size %}
+                {% assign metadata = page.meta %}
+              {% endif %}
+              {% if metadata.size %}
+                {% include keywords_metadata.html meta=metadata %}
+              {% endif %}
+            </div>
+          </div>
+    
+          {% if excerpt %}
+            <div class="tab-pane fade" id="transcription">
+              {% capture excerpt_file %}excerpts/{{ page.pid }}.md{% endcapture %}
+              {% capture data %}{% include_relative {{ excerpt_file }} %}{% endcapture %}
+              <div class="excerpt px-2 py-4">
+                {{ data | markdownify }}  
+              </div>
+            </div>
+            {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  const hiddenElements = [
+    '.card',
+    '.metadata-block dt',
+    '.metadata-block dd',
+    '.metadata-block dd .badge-pill',
+    '.excerpt h1',
+    '.excerpt h2',
+    '.excerpt p',
+    '.excerpt div'
+  ].join(',');
+  // Initial page load
+  // TODO:
+  // Not quite right, we'll want the pills to stagger-appear inline with
+  // its container <dd>. Currently, all <dt> and <dd> stagger-appear, then
+  // the pills stagger-appear
+  Motion.animate(hiddenElements, { opacity: 0 }, { duration: 0 })
+    .then(() => Motion.animate('.card', { opacity: 1 }, { duration: 0.2 }))
+    .then(() => Motion.animate(
+        '.metadata-block dt, .metadata-block dd',
+        { opacity: 1 },
+        { delay: Motion.stagger(0.05) }
+      ).then(() => {
+        return Promise.all(
+          Motion.animate(
+            '.metadata-block dd .badge-pill',
+            { opacity: 1 },
+            { delay: Motion.stagger(0.1) }
+          ),
+          Motion.animate(
+            '.excerpt h1, .excerpt h2, .excerpt p, .excerpt div',
+            { opacity: 1 },
+            { delay: Motion.stagger(0.1) }
+          ));
+      })
+    );
+</script>

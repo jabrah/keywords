@@ -81,3 +81,8 @@ footer {
     max-height: 250px !important;
     // max-width: 250px !important;
 }
+
+.excerpt {
+    max-height: 75vh;
+    overflow: auto;
+}
