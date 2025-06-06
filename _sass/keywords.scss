@@ -78,18 +78,23 @@ footer {
 // !importants in order to override Bootstrap classes
 .gallery-thumb {
     height: initial;
-    max-height: 250px !important;
+    // max-height: 250px !important;
     max-width: 250px !important;
 }
 
 .item-metadata {
-  padding: 2rem;
-  max-height: calc(100vh - 50px);
-  overflow: scroll;
+  padding: 0;
+  
+  .tab-content .active {
+    height: calc(100vh - 93px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 0;
+  }
 }
 .image-viewer {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 50px);
+  height: calc(100vh - 43px);
 }
