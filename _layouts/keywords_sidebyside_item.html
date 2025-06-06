@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+  {%- include head.html -%}
+  <body>
+    {%- include header.html -%}
+    <main class="container-lg" aria-label="Content">
+
+      <div class="row">
+        {% assign links = site[page.collection] | sort: 'order' | map: 'url' %}
+        {% for link in links %}
+          {% if link == page.url %}
+            {% if forloop.first %}
+              {% assign prevlink = links | last %}
+              {% assign nextlink = links[forloop.index] %}
+            {% elsif forloop.last %}
+              {% assign prevlink = prev %}
+              {% assign nextlink = links | first %}
+            {% else %}
+              {% assign prevlink = prev %}
+              {% assign nextlink = links[forloop.index] %}
+            {% endif %}
+          {% endif %}
+          {% assign prev = link %}
+        {% endfor %}
+        <div class="pagination mx-auto">
+          <div class='pagination-link' id='prevlink' alt="Go to previous document">
+            <a href='{{ prevlink | absolute_url }}' >&#9668;</a>
+          </div>
+          <div class='pagination-link' id='nextlink' alt="Go to next document">
+            <a href='{{ nextlink | absolute_url }}' >&#9658;</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <h1 alt="{{ page.label }}" class='item-label mb-4'>
+          {{ page.label }}
+        </h1>
+      </div>
+      
+      <div class="row mb-4">
+        <div class="col-lg-6">
+          <div class='row card thumbnail-card'>
+          <!-- The block below controls the image viewer -->
+          
+            {% if page.image_viewer %}
+              {% assign viewer = page.image_viewer %}
+            {% elsif layout.image_viewer %}
+              {% assign viewer = layout.image_viewer %}
+            {% endif %}
+          
+            {% if viewer %}
+              <div class='item-view w-100'>
+                {% if viewer == 'openseadragon' %}
+                  {% include osd_iiif_image_viewer.html manifest=page.manifest prevlink=prevlink nextlink=nextlink %}
+                {% else %}
+                    {% include simple_image_viewer.html full_image=page.full prevlink=prevlink nextlink=nextlink %}
+                {% endif %}
+              </div>
+            {% endif %}
+
+        </div>
+      </div>
+      <div class="col-lg-6">
+
+        <div class="card">
+          <div class="card-body item-metadata w-100">
+            <!-- The block below controls the item metadata table -->
+
+            <div id="metadata-from-csv" class="row">
+              {% if layout.meta.size %}
+                {% assign metadata = layout.meta %}
+              {% elsif page.meta.size %}
+                {% assign metadata = page.meta %}
+              {% endif %}
+              {% if metadata.size %}
+                {% include keywords_metadata.html meta=metadata %}
+              {% endif %}
+            </div>
+        
+            <div>
+              {% assign excerpt = site.documents | where: 'collection', page.collection | where_exp: 'doc', "doc.path contains '/excerpts/'" | where: 'basename', page.pid | first %}
+              {% if excerpt %}
+                {% capture excerpt_file %}excerpts/{{ page.pid }}.md{% endcapture %}
+                {% capture data %}{% include_relative {{ excerpt_file }} %}{% endcapture %}
+                {{ data | markdownify }}  
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      </div>
+
+      <section class="my-4">
+        {{content}}
+      </section>
+
+    </main>
+    {%- include footer.html -%}
+  </body>
+</html>
+
+
