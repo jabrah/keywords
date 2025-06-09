@@ -23,73 +23,56 @@ filters in the collection_gallery.html include.
 
 */
 
-// Set up empty object to store checkbox selections
-var facets = {};
+// Selected facets
+let facets = {};
 
-// Set up empty array to store the ids of each facet fieldset
-var setIds = [];
+// IDs of each facet fieldset
+let setIds = [];
 
 $("fieldset").each(function (i, e) {
   setIds.push(e.id);
 });
 
-// Count the number of fieldsets on the page
-var numberFacets = setIds.length;
+// Number of fieldsets on the page
+const numberFacets = setIds.length;
 
-// Set up a 'for' loop to run through the fieldset ids and
-// use each of them as a key for the 'facets' object. Each
-// key gets an empty array, which will be used to store
-// currently active checkboxes in that fieldset.
-var i;
-
-for (i = 0; i < numberFacets; i++) {
+// Use each of them as a key for the 'facets' object. Each key gets an empty array,
+// which will be used to store currently active checkboxes in that fieldset.
+for (let i = 0; i < numberFacets; i++) {
   facets[setIds[i]] = new Array();
-  // console.log(facets[setIds[i]])
 }
 
-// add code that runs whenever a checkbox is turned on or off
 $("#facets :checkbox").change(function () {
-  // find the checkboxes parent fieldset id by taking its class name
-  // and adding "-set" to the end
-  var pinClass = this.className + "-set";
-  //console.log(pinClass);
+  // Find the checkboxes parent fieldset id by taking its class name and adding "-set" to the end
+  const pinClass = `${this.className}-set`;
 
-  // find the id for this checkbox
-  var pinId = this.id;
-  //console.log(pinId);
-
-  // use fieldset id as key to facets object; add or remove current checkbox id
+  // Use fieldset id as key to facets object; add or remove current checkbox id
   // from the array for that key.
   if (this.checked) {
-    facets[pinClass].push(pinId);
-    //console.log(facets[pinClass]);
+    facets[pinClass].push(this.id);
   } else {
-    facets[pinClass] = facets[pinClass].filter(function (value, index, arr) {
-      return value != pinId;
-    });
-    //console.log(facets[pinClass]);
+    facets[pinClass] = facets[pinClass].filter((value) => value != this.id);
   }
 
-  // after updating the facets object, rerun refreshGallery()
+  // After updating the facets object, rerun refreshGallery()
   refreshGallery();
 });
 
+/**
+ * Shows / hides items based on active checkboxes
+ */
 function refreshGallery() {
-  // this function shows and hides gallery items based on active checkboxes
+  // Grab all gallery items
+  let listOfElements = $(".gallery-item-facets");
 
-  // grab all gallery items
-  var listOfElements = $(".gallery-item-facets");
-
-  // start by clearing the gallery of all items
+  // Start by clearing the gallery of all items
   listOfElements.hide("slow");
 
-  // starting with the full list of all elements, loop through each fieldset
+  // Starting with the full list of all elements, loop through each fieldset
   // one at a time and keep only the elements that have one or more of the
   // desired values (based on checkboxes)
   // - loop through each fieldset in facets
-  // - if the array is empty (e.g., no checkboxes checked), take all possible
-  //   values in that fieldset and treat them as valid by including them in the
-  //   list of desired values
+  // - if the array is empty (e.g., no checkboxes checked), show all items
   // - if the array is not empty (e.g., one or more checkboxes checked),
   //   add only the items from the array to the list of desired values
   // - in both cases, add a "." before the checkbox id so it can be used as a
@@ -100,16 +83,14 @@ function refreshGallery() {
   // - filter the running list of elements to exclude elements that have none
   //   of the specified classes
   // - after finishing the for loop, take all remaining elements and show them
-  for (i = 0; i < numberFacets; i++) {
-    var inputIds = [];
+  for (let i = 0; i < numberFacets; i++) {
+    let inputIds = [];
     if (facets[setIds[i]].length == 0) {
-      $(`#${setIds[i]} input`).each(function (i, e) {
-        inputIds.push("." + e.id);
-      });
+      // When no facets selected, instead of filtering by facet class
+      // This will show everything including items that don't have any facet-set class
+      inputIds.push('.gallery-item-facets');
     } else {
-      inputIds = facets[setIds[i]].map(function (el) {
-        return "." + el;
-      });
+      inputIds = facets[setIds[i]].map((id) => "." + id );
     }
     listOfClasses = inputIds.join(",");
     listOfElements = listOfElements.filter($(`${listOfClasses}`));

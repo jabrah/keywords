@@ -151,7 +151,7 @@ a.action-button:hover {
         img {
           float: left;
         }
-        p {
+        p, div {
           margin: 0 !important;
           padding: 0;
           .title {
@@ -290,8 +290,8 @@ p.card-text {
     (Copy the CSS below if you're importing into your own theme)
 */
 
-input[type="checkbox"] {
-  margin-right: 4px;
+.facet-item label, input[type="checkbox"] {
+  cursor: pointer;
 }
 
 .facet-card {

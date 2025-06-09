@@ -18,23 +18,37 @@ function getThumbnail(item, url) {
   }
 }
 
+function getSnippet(item, fields, metadata) {
+  return metadata
+    .filter(subtitle => fields.includes(subtitle) && item[subtitle])
+    .map((subtitle) => {
+      let label = subtitle.replaceAll('_', ' ');
+      label = `${label.charAt(0).toUpperCase()}${label.slice(1)}`
+      return `<b>${label}</b>: ${item[subtitle]}`;
+    })
+    .join(' | ');
+}
+
 function displayResult(item, fields, url, subtitles) {
   var pid   = item.pid;
   var label = item.label || 'Untitled';
   var link  = item.permalink;
   var thumb = getThumbnail(item, url);
 
-  var meta = subtitles
-    .filter(subtitle => fields.includes(subtitle))
-    .map((subtitle) => {
-      let label = subtitle.replaceAll('_', ' ');
-      label = `${label.charAt(0).toUpperCase()}${label.slice(1)}`
-      return `<b>${label}</b>: ${item[subtitle]}`;
-    })
-    .join(' | ')
-
-  // note: href below not working on localhost
-  return `<div class="result"><a href="..${link}">${thumb}<p><span class="title">${item.label}</span><br><span class="meta">${meta}</span></p></a></div>`;
+  const result = `
+  <div class="result">
+    <a class="result-link" href="${link}">
+      <span class="result-thumbnail">${thumb}</span>
+      <div class="w-100">
+        <div class="title">${item.label}</div>
+        <div class="meta text-truncate">
+          ${getSnippet(item, fields, subtitles)}
+        </div>
+      </div>
+    </a>
+  </div>
+  `;
+  return result;
 }
 
 function startSearchUI(fields, indexFile, url, subtitles) {
@@ -44,8 +58,8 @@ function startSearchUI(fields, indexFile, url, subtitles) {
     index.saveDocument(false);
     index.setRef('lunr_id');
 
-    for (i in fields) { index.addField(fields[i]); }
-    for (i in store)  { index.addDoc(store[i]); }
+    for (let i in fields) { index.addField(fields[i]); }
+    for (let i in store)  { index.addDoc(store[i]); }
 
     $('input#search').on('keyup', function() {
       var results_div = $('#results');

@@ -64,6 +64,14 @@ search:
           - lhc_doc_type
           - keywords
           - abstract
+      keywords_descriptions:
+        content: false
+        fields:
+          - pid
+          - label
+          - Keyword
+          - Description
+          - "Main Bias Set Records"
 
 # --------------------------------------------------------------
 # SITE MENU SETTINGS

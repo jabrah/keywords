@@ -29,6 +29,7 @@ Explore a sample of the documents below.
     facet_by='language'
     num_column=4
     sortBy='filing_date'
+    separator=','
     display_fields="lhc_source,lhc_doc_origin,lhc_filing_date"
 %}
 

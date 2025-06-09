@@ -48,25 +48,32 @@ jobs:
       - name: Setup ImageMagick
         uses: mfinelli/setup-imagemagick@v6.0.0
 
-      # Run the Wax tasks for our Keywords collections
-      # This will generate pages, search index, and IIIF image derivatives
-      - name: 'Wax build: Keywords'
+      # Cache image derivs, because they take a long time to generate
+      # Single images and images in folders are matched
+      # jp*g is used to glob match jpg and jpeg
+      - name: 'Cache image derivatives'
+        id: cache-image-derivs
+        uses: actions/cache@v4
+        with:
+          path: img/
+          key: ${{ runner.os }}-image-derivatives-${{ hashFiles('_data/raw_images/keywords/*.jp*g', '_data/raw_images/keywords/**/*.jp*g') }}
+      
+      # Generate image derivatives if cache is not found
+      - name: 'Generate IIIF image derivatives'
+        id: gen-img-derivs
+        if: steps.cache-image-derivs.outputs.cache.hit != 'true'
+        shell: bash
+        run: bundle exec rake wax:derivatives:iiif keywords
+
+      # Run the Wax tasks: generate pages and search index
+      - name: 'Wax build: pages'
         id: wax-tasks-kw
         shell: bash
         run: |
-          bundle exec rake wax:derivatives:iiif keywords
           bundle exec rake wax:pages keywords
+          bundle exec rake wax:pages keywords_descriptions
+          bundle exec rake wax:pages people
           bundle exec rake wax:search main
-      
-      # Run Wax tasks for the 'Keywords descriptions' collection
-      # Only needs pages generated for now
-      - name: 'Wax build: Keywords descriptions'
-        shell: bash
-        run: bundle exec rake wax:pages keywords_descriptions
-      
-      - name: 'Wax build: People'
-        shell: bash
-        run: bundle exec rake wax:pages people
 
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
