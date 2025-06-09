@@ -63,92 +63,90 @@
         </div>
         <div class="col-lg-6">
 
-          <!-- <div class=""> -->
-            <div class="item-metadata w-100">
-              <!-- The block below controls the item metadata table -->
-              {% assign excerpt = site.documents | where: 'collection', page.collection | where_exp: 'doc', "doc.path contains '/excerpts/'" | where: 'basename', page.pid | first %}
-              {% assign current_doc = site.documents | where_exp: 'doc', "doc.path contains '/excerpts/'" %}
+          <div class="item-metadata w-100">
+            <!-- The block below controls the item metadata table -->
+            {% assign excerpt = site.documents | where: 'collection', page.collection | where_exp: 'doc', "doc.path contains '/excerpts/'" | where: 'basename', page.pid | first %}
+            {% assign current_doc = site.documents | where_exp: 'doc', "doc.path contains '/excerpts/'" %}
 
-              {% capture desired_path_part %}/excerpts/{{ page.pid | strip }}/{% endcapture %}
+            {% capture desired_path_part %}/excerpts/{{ page.pid | strip }}/{% endcapture %}
 
-              {% assign folder_matches = "" | split: "" %}
-              {% for doc in site.documents %}
-                {% if doc.path contains desired_path_part %}
-                  {% assign folder_matches = folder_matches | push: doc %}
-                {% endif %}
-              {% endfor %}
+            {% assign folder_matches = "" | split: "" %}
+            {% for doc in site.documents %}
+              {% if doc.path contains desired_path_part %}
+                {% assign folder_matches = folder_matches | push: doc %}
+              {% endif %}
+            {% endfor %}
 
-              {% assign folder_matches = folder_matches | sort: "basename" %}
+            {% assign folder_matches = folder_matches | sort: "basename" %}
 
-              <nav>
-                <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                  <button class="nav-link active" id="nav-metadata-tab-btn" 
-                      data-toggle="tab" data-target="#tab-metadata" type="button" 
-                      role="tab" aria-controls="tab-metadata" aria-selected="true"
-                  >
-                    Metadata
-                  </button>
-                  {% if folder_matches != empty %}
-                    {% for file in folder_matches %}
-                      {% assign name = file.basename %}
-                      <button class="nav-link" id="nav-{{name}}-tab-btn"
-                          data-toggle="tab" data-target="#tab-{{name}}" type="button"
-                          role="tab" aria-controls="tab-{{name}}" aria-selected="false"
-                      >
-                        {{ name }}
-                      </button>
-                    {% endfor %}
-                  {% elsif excerpt %}
-                  <button class="nav-link" id="nav-excpert-tab-btn"
-                      data-toggle="tab" data-target="#tab-excerpt" type="button"
-                      role="tab" aria-controls="tab-excerpt" aria-selected="false"
-                  >
-                    Excerpt
-                  </button>
-                  {% endif %}
-                </div>
-              </nav>
-
-              <div class="tab-content p-1" id="nav-tabContent">
-                <div id="tab-metadata" class="tab-pane fade show active" 
-                    role="tabpanel" aria-labelledby="nav-metadata-tab-btn"
+            <nav>
+              <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <button class="nav-link active" id="nav-metadata-tab-btn" 
+                    data-toggle="tab" data-target="#tab-metadata" type="button" 
+                    role="tab" aria-controls="tab-metadata" aria-selected="true"
                 >
-                  <div class="row">
-                    {% if layout.meta.size %}
-                      {% assign metadata = layout.meta %}
-                    {% elsif page.meta.size %}
-                      {% assign metadata = page.meta %}
-                    {% endif %}
-                    {% if metadata.size %}
-                      {% include keywords_metadata.html meta=metadata %}
-                    {% endif %}
-                  </div>
-                </div>
-            
+                  Metadata
+                </button>
                 {% if folder_matches != empty %}
                   {% for file in folder_matches %}
-                  <div id="tab-{{file.basename}}" class="tab-pane fade"
-                      role="tabpanel" aria-labelledby="nav-{{file.basename}}-tab-btn"
-                  >
-                    {% assign path_parts = file.path | split: "/" %}
-                    {% assign sans_collection = path_parts | slice: 1, path_parts.size | join: "/" %}
-                    {% capture excerpt_content %}{% include_relative {{ sans_collection }} %}{% endcapture %}
-                    {{ excerpt_content | markdownify }}
-                  </div>
+                    {% assign name = file.basename %}
+                    <button class="nav-link" id="nav-{{name}}-tab-btn"
+                        data-toggle="tab" data-target="#tab-{{name}}" type="button"
+                        role="tab" aria-controls="tab-{{name}}" aria-selected="false"
+                    >
+                      {{ name | replace: "_", " " }}
+                    </button>
                   {% endfor %}
                 {% elsif excerpt %}
-                <div id="tab-excerpt" class="tab-pane fade"
-                    role="tabpanel" aria-labelledby="nav-excpert-tab-btn"
+                <button class="nav-link" id="nav-excpert-tab-btn"
+                    data-toggle="tab" data-target="#tab-excerpt" type="button"
+                    role="tab" aria-controls="tab-excerpt" aria-selected="false"
                 >
-                  {% capture excerpt_file %}excerpts/{{ page.pid }}.md{% endcapture %}
-                  {% capture data %}{% include_relative {{ excerpt_file }} %}{% endcapture %}
-                  {{ data | markdownify }}
-                </div>
+                  Excerpt
+                </button>
                 {% endif %}
-
               </div>
+            </nav>
+
+            <div class="tab-content p-1" id="nav-tabContent">
+              <div id="tab-metadata" class="tab-pane fade show active" 
+                  role="tabpanel" aria-labelledby="nav-metadata-tab-btn"
+              >
+                <div class="row">
+                  {% if layout.meta.size %}
+                    {% assign metadata = layout.meta %}
+                  {% elsif page.meta.size %}
+                    {% assign metadata = page.meta %}
+                  {% endif %}
+                  {% if metadata.size %}
+                    {% include keywords_metadata.html meta=metadata %}
+                  {% endif %}
+                </div>
+              </div>
+          
+              {% if folder_matches != empty %}
+                {% for file in folder_matches %}
+                <div id="tab-{{file.basename}}" class="tab-pane fade"
+                    role="tabpanel" aria-labelledby="nav-{{file.basename}}-tab-btn"
+                >
+                  {% assign path_parts = file.path | split: "/" %}
+                  {% assign sans_collection = path_parts | slice: 1, path_parts.size | join: "/" %}
+                  {% capture excerpt_content %}{% include_relative {{ sans_collection }} %}{% endcapture %}
+                  {{ excerpt_content | markdownify }}
+                </div>
+                {% endfor %}
+              {% elsif excerpt %}
+              <div id="tab-excerpt" class="tab-pane fade"
+                  role="tabpanel" aria-labelledby="nav-excpert-tab-btn"
+              >
+                {% capture excerpt_file %}excerpts/{{ page.pid }}.md{% endcapture %}
+                {% capture data %}{% include_relative {{ excerpt_file }} %}{% endcapture %}
+                {{ data | markdownify }}
+              </div>
+              {% endif %}
+
             </div>
-          <!-- </div> -->
+          </div>
 
         </div>
 
