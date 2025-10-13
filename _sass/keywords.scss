@@ -1,3 +1,5 @@
+@use "variables" as *;
+
 main {
     a:not(.badge) {
         color: $dark-background;
