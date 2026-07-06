@@ -13,6 +13,9 @@ $(document).ready(function () {
             .children(".facets-chevron")
             .toggleClass("facets-chevron-bottom facets-chevron-top");
     });
+
+    // Sort options logic
+    initSortOptions();
 });
 
 
@@ -96,4 +99,97 @@ function refreshGallery() {
     listOfElements = listOfElements.filter($(`${listOfClasses}`));
   }
   listOfElements.show("slow");
+}
+
+
+/*
+    SORT OPTIONS
+    Client-side sorting of gallery items by data attributes.
+*/
+
+function initSortOptions() {
+  const $sortRadios = $(".sort-option-radio");
+  const $reverseCheckbox = $("#sort-reverse-checkbox");
+  const $clearBtn = $("#sort-clear-btn");
+
+  if ($sortRadios.length === 0) return;
+
+  // Store the original DOM order so we can restore it on "Clear sort"
+  const $galleryRow = $(".wax-gallery .row");
+  const originalOrder = $galleryRow.children(".gallery-item-facets").toArray();
+
+  $sortRadios.on("change", function () {
+    sortGallery($galleryRow);
+  });
+
+  $reverseCheckbox.on("change", function () {
+    // Only sort if a sort option is already selected
+    if ($(".sort-option-radio:checked").length > 0) {
+      sortGallery($galleryRow);
+    }
+  });
+
+  $clearBtn.on("click", function () {
+    // Uncheck radio and reverse checkbox
+    $sortRadios.prop("checked", false);
+    $reverseCheckbox.prop("checked", false);
+
+    // Restore default sort order (the order from the server-rendered HTML,
+    // which reflects the include's sortBy/sortOrder)
+    var items = originalOrder.slice();
+    $galleryRow.append(items);
+  });
+}
+
+/**
+ * Sorts gallery items based on the selected sort option and reverse checkbox.
+ */
+function sortGallery($galleryRow) {
+  const selectedOption = $(".sort-option-radio:checked").val();
+  if (!selectedOption) return;
+
+  const isReversed = $("#sort-reverse-checkbox").is(":checked");
+  const dataAttr = "data-sort-" + slugify(selectedOption);
+
+  const $items = $galleryRow.children(".gallery-item-facets");
+  const sorted = $items.toArray().sort(function (a, b) {
+    const aVal = ($(a).attr(dataAttr) || "").toLowerCase();
+    const bVal = ($(b).attr(dataAttr) || "").toLowerCase();
+
+    // Try numeric comparison first
+    const aNum = parseFloat(aVal);
+    const bNum = parseFloat(bVal);
+    if (!isNaN(aNum) && !isNaN(bNum)) {
+      return aNum - bNum;
+    }
+
+    // Try date comparison
+    const aDate = Date.parse(aVal);
+    const bDate = Date.parse(bVal);
+    if (!isNaN(aDate) && !isNaN(bDate)) {
+      return aDate - bDate;
+    }
+
+    // Fall back to string comparison
+    return aVal.localeCompare(bVal);
+  });
+
+  if (isReversed) {
+    sorted.reverse();
+  }
+
+  $galleryRow.append(sorted);
+}
+
+/**
+ * Replicates Jekyll's slugify filter for generating data attribute names.
+ */
+function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }

@@ -32,10 +32,13 @@
 
 {% comment %}- END SUBSET PARSING -{% endcomment%}
 
+{% comment %} ###### Container for gallery controls ###### {% endcomment %}
+<div class="row">
+
 {% comment %} :::: FACETS :::: {% endcomment%}
 
 {% if include.facet_by %}
-  <form class="row" id="facets">
+  <form class="" id="facets">
     {% assign facet_list = include.facet_by | split: separator %}
     {% for facet in facet_list %}
       {% comment %}- MULTI-VALUE FACETS -{% endcomment%}
@@ -101,7 +104,7 @@
             aria-expanded="false"
             aria-controls="{{ facet_name | slugify }}-collapse"
           >
-            <legend class="px-4 py-2">{{ facet_name | replace: "_", " " }}<span
+            <legend class="px-4 py-2">Filter by: {{ facet_name | replace: "_", " " }}<span
                 aria-hidden="true"
                 class="facets-chevron facets-chevron-bottom float-right ml-2"
               ></span>
@@ -135,6 +138,78 @@
 
 {% comment %} :::: END FACETS :::: {% endcomment%}
 
+{% comment %} :::: SORT OPTIONS :::: {% endcomment%}
+
+{% if include.sortOptions %}
+  {% assign sort_option_list = include.sortOptions | split: "," %}
+  <div class="" id="sort-options">
+    <fieldset id="sort-options-set" class="card m-1 facet-card">
+      <div class="facet-header card-header p-0">
+        <a
+          class="facet-bn"
+          data-toggle="collapse"
+          href="#sort-options-collapse"
+          role="button"
+          aria-expanded="false"
+          aria-controls="sort-options-collapse"
+        >
+          <legend class="px-4 py-2">Sort by<span
+              aria-hidden="true"
+              class="facets-chevron facets-chevron-bottom float-right ml-2"
+            ></span>
+          </legend>
+        </a>
+      </div>
+      <div class="collapse" id="sort-options-collapse">
+        <div class="card-body">
+          {% for sort_option in sort_option_list %}
+            {% assign sort_option_stripped = sort_option | strip %}
+            <div class="sort-option-item">
+              <label for="sort-{{ sort_option_stripped | slugify }}">
+                <input
+                  id="sort-{{ sort_option_stripped | slugify }}"
+                  class="sort-option-radio"
+                  type="radio"
+                  name="sort-option"
+                  value="{{ sort_option_stripped }}"
+                />
+                <span class="mx-2">{{ sort_option_stripped | replace: "_", " " | capitalize }}</span>
+              </label>
+            </div>
+          {% endfor %}
+          <hr class="my-2" />
+          <div class="sort-option-item">
+            <label for="sort-reverse-checkbox">
+              <input
+                id="sort-reverse-checkbox"
+                type="checkbox"
+                name="sort-reverse"
+              />
+              <span class="mx-2">Reverse order</span>
+            </label>
+          </div>
+          <div class="mt-2">
+            <button type="button" id="sort-clear-btn" class="btn btn-sm btn-outline-secondary">
+              Clear sort
+            </button>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+  <script>
+    window.__galleryDefaultSort = {
+      sortBy: "{{ include.sortBy | default: '' }}",
+      sortOrder: "{{ include.sortOrder | default: '' }}"
+    };
+  </script>
+{% endif %}
+
+{% comment %} :::: END SORT OPTIONS :::: {% endcomment%}
+
+</div>
+{% comment %} ###### End container for gallery controls ###### {% endcomment %}
+
 <!-- THE GALLERY -->
 <div class="wax-gallery-container full-width" id="wax-gallery-{{ include.value | slugify }}-container" >
   <div class="wax-inline-container">
@@ -165,7 +240,14 @@
             {% endfor %}
           {% endif %}
 
-          <div class="gallery-item-facets {{ newClasses | join: ' ' }} col-xl-{{min_column_width}} p-1">
+          <div class="gallery-item-facets {{ newClasses | join: ' ' }} col-xl-{{min_column_width}} p-1"
+            {% if include.sortOptions %}
+              {% for sort_option in sort_option_list %}
+                {% assign sort_option_stripped = sort_option | strip %}
+                data-sort-{{ sort_option_stripped | slugify }}="{{ item[sort_option_stripped] }}"
+              {% endfor %}
+            {% endif %}
+          >
             <a href="{{ item.url | relative_url }}">
               <div class="card thumbnail-card h-100">
                 <img

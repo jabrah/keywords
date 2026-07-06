@@ -9,3 +9,16 @@
     text-decoration: underline;
   }
 }
+
+// Sort options on gallery
+#sort-options {
+  .sort-option-item {
+    label, input[type="radio"], input[type="checkbox"] {
+      cursor: pointer;
+    }
+  }
+
+  #sort-clear-btn {
+    font-size: 0.85rem;
+  }
+}
