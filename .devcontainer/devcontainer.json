@@ -1,0 +1,21 @@
+{
+  "name": "Keywords for Black Louisiana",
+  "image": "mcr.microsoft.com/devcontainers/ruby:3.4",
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/regenerate.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "shopify.ruby-lsp",
+        "shopify.theme-check-vscode"
+      ]
+    }
+  },
+  "forwardPorts": [4000],
+  "portsAttributes": {
+    "4000": {
+      "label": "Jekyll",
+      "onAutoForward": "notify"
+    }
+  }
+}

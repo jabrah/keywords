@@ -119,3 +119,16 @@ menu:
   - label: "Search"
     link: "/search/"
     icon: "search"
+
+exclude:
+  - .devcontainer
+  - README.md
+  - Rakefile
+  - Gemfile
+  - Gemfile.lock
+  - LICENSE.txt
+  - Wax_Facets.md
+  - facet_pages_howto.md
+  - extra.txt
+  - desktop.ini
+  - .tool-versions
